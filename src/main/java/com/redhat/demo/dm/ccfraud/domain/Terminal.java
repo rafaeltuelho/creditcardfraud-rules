@@ -11,7 +11,7 @@ public class Terminal {
 
 	private long id;
 	private CountryCode countryCode;
-	
+
 	public Terminal(long id, CountryCode countryCode) {
 		this.id = id;
 		this.countryCode = countryCode;
@@ -23,6 +23,14 @@ public class Terminal {
 
 	public CountryCode getCountryCode() {
 		return countryCode;
+	}
+
+	@Override
+	public String toString() {
+		return "{" +
+			" id='" + getId() + "'" +
+			", countryCode='" + getCountryCode() + "'" +
+			"}";
 	}
 	
 }

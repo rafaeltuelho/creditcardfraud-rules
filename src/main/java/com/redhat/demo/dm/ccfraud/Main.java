@@ -4,7 +4,12 @@ import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Collection;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import org.kie.api.KieServices;
@@ -32,6 +37,8 @@ public class Main {
 	private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
 	private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyyMMdd:HHmmssSSS");
+
+	private static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss:SSS", Locale.US);
 
 	private static final KieServices KIE_SERVICES = KieServices.Factory.get();
 
@@ -68,7 +75,6 @@ public class Main {
 
 		KieSession kieSession = kieContainer.newKieSession();
 		// Insert transaction history/context.
-		LOGGER.debug("Inserting credit-card transaction context into session.");
 		for (CreditCardTransaction nextTransaction : ccTransactions) {
 			insert(kieSession, "Transactions", nextTransaction);
 		}
@@ -104,16 +110,26 @@ public class Main {
 			throw new IllegalStateException(errorMessage);
 		}
 		SessionPseudoClock pseudoClock = (SessionPseudoClock) clock;
+		LOGGER.debug( "\tCEP Engine PseudoClock current time: " + LocalDateTime.ofInstant(Instant.ofEpochMilli(pseudoClock.getCurrentTime()), ZoneId.systemDefault()).toString() );
 		EntryPoint ep = kieSession.getEntryPoint(stream);
 
 		// First insert the event
 		FactHandle factHandle = ep.insert(cct);
 		// And then advance the clock.
-
+		LOGGER.debug(" ");
+		LOGGER.debug("Inserting credit-card [" + cct.getCreditCardNumber() + "] transaction [" + cct.getTransactionNumber() + "] context into session.");
+		String dateTimeFormatted = LocalDateTime.ofInstant(
+			Instant.ofEpochMilli(cct.getTimestamp()), ZoneId.systemDefault()).format(DATE_TIME_FORMAT);
+		LOGGER.debug( "\tCC Transaction Time: " + dateTimeFormatted);
 		long advanceTime = cct.getTimestamp() - pseudoClock.getCurrentTime();
 		if (advanceTime > 0) {
-			LOGGER.debug("Advancing the PseudoClock with " + advanceTime + " milliseconds.");
+			long tSec = advanceTime/1000;
+			LOGGER.debug("\tAdvancing the PseudoClock with " + advanceTime + " milliseconds (" + tSec + "sec)" );
+			
 			pseudoClock.advanceTime(advanceTime, TimeUnit.MILLISECONDS);
+			dateTimeFormatted = LocalDateTime.ofInstant(
+				Instant.ofEpochMilli(pseudoClock.getCurrentTime()), ZoneId.systemDefault()).format(DATE_TIME_FORMAT);
+			LOGGER.debug( "\tCEP Engine PseudoClock ajusted time: " +  dateTimeFormatted);
 		} else {
 			// Print a warning when we don't need to advance the clock. This usually means that the events are entering the system in the
 			// incorrect order.

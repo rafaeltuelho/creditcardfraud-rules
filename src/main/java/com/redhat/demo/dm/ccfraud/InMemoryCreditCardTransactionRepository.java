@@ -26,7 +26,8 @@ public class InMemoryCreditCardTransactionRepository implements CreditCardTransa
 		ccTransactions = new HashMap<>();
 		
 		//Load the facts/events from our CSV file.
-		InputStream ccTransactionsInputStream = Main.class.getClassLoader().getResourceAsStream(TRANSACTIONS_CSV_FILE);
+		InputStream ccTransactionsInputStream = InMemoryCreditCardTransactionRepository.
+			class.getClassLoader().getResourceAsStream(TRANSACTIONS_CSV_FILE);
 		List<CreditCardTransaction> loadedTransactions = FactsLoader.loadFacts(ccTransactionsInputStream);
 				
 		for (CreditCardTransaction nextTransaction: loadedTransactions) {

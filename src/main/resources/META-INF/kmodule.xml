@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<kmodule xmlns="http://jboss.org/kie/6.0.0/kmodule">
-    <kbase name="ccfd-rules" equalsBehavior="equality" eventProcessingMode="stream" packages="rules">
-        <ksession name="cdfd-session" default="true" type="stateful" clockType="pseudo"/>
+<kmodule xmlns="http://www.drools.org/xsd/kmodule" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <kbase name="ccfd-rules" default="true" 
+            equalsBehavior="equality" 
+            eventProcessingMode="stream" 
+            packages="com.redhat.demo.dm.ccfraud">
+        <ksession name="cdfd-session" default="true" type="stateful" clockType="pseudo">
+            <!--
+            <listeners>
+                <ruleRuntimeEventListener type="org.kie.api.event.rule.DebugRuleRuntimeEventListener"/>
+                <agendaEventListener type="org.drools.core.event.DebugAgendaEventListener"/>
+            </listeners>
+            -->
+        </ksession>
     </kbase>
 </kmodule>

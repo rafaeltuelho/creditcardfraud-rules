@@ -12,7 +12,9 @@ import java.util.Collection;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.Test;
 import org.kie.api.KieServices;
+import org.kie.api.definition.type.Timestamp;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.rule.EntryPoint;
@@ -27,28 +29,26 @@ import com.redhat.demo.dm.ccfraud.domain.CreditCardTransaction;
 import com.redhat.demo.dm.ccfraud.domain.Terminal;
 
 /**
- * Main class of the demo project wich creates a new {@link CreditCardTransaction}, loads the previous transactions from a CSV file and uses
+ * Test Scenario for the demo project wich creates a new {@link CreditCardTransaction}, 
+ * loads the previous transactions from a CSV file and uses
  * the Drools CEP engine to determine whether there was a potential fraud with the transactions.
  * 
  * @author <a href="mailto:duncan.doyle@redhat.com">Duncan Doyle</a>
  */
-public class Main {
+public class MainTest {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
+	private final Logger LOGGER = LoggerFactory.getLogger(MainTest.class);
+	private final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyyMMdd:HHmmssSSS");
+	private final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss:SSS", Locale.US);
+	private final KieServices KIE_SERVICES = KieServices.Factory.get();
+	private KieContainer kieContainer;
 
-	private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyyMMdd:HHmmssSSS");
+	private CreditCardTransactionRepository cctRepository = new InMemoryCreditCardTransactionRepository();
 
-	private static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss:SSS", Locale.US);
-
-	private static final KieServices KIE_SERVICES = KieServices.Factory.get();
-
-	private static KieContainer kieContainer;
-
-	private static CreditCardTransactionRepository cctRepository = new InMemoryCreditCardTransactionRepository();
-
-	public static void main(String[] args) {
+	@Test
+	public void mainTest() {
 		// Load the Drools KIE-Container.
-		kieContainer = KIE_SERVICES.newKieClasspathContainer();
+		kieContainer = KIE_SERVICES.getKieClasspathContainer();
 
 		long transactionTime = 0L;
 		try {
@@ -59,14 +59,14 @@ public class Main {
 
 		// Define the new incoming credit-card transaction. In an actual system, this event would come a Kafka stream or a Vert.x EventBus
 		// event.
-		CreditCardTransaction incomingTransaction = new CreditCardTransaction(100, 12345, new BigDecimal(10.99), transactionTime,
-				new Terminal(1, CountryCode.US));
+		CreditCardTransaction incomingTransaction = new CreditCardTransaction(
+			100, 12345, new BigDecimal(10.99), transactionTime, new Terminal(1, CountryCode.US));
 
 		// Process the incoming transaction.
 		processTransaction(incomingTransaction);
 	}
 
-	private static void processTransaction(CreditCardTransaction ccTransaction) {
+	private void processTransaction(CreditCardTransaction ccTransaction) {
 		// Retrieve all transactions for this account
 		Collection<CreditCardTransaction> ccTransactions = cctRepository
 				.getCreditCardTransactionsForCC(ccTransaction.getCreditCardNumber());
@@ -79,6 +79,7 @@ public class Main {
 			insert(kieSession, "Transactions", nextTransaction);
 		}
 		// Insert the new transaction event
+		LOGGER.debug(" ");
 		LOGGER.debug("Inserting credit-card transaction event into session.");
 		insert(kieSession, "Transactions", ccTransaction);
 		// And fire the rules.
@@ -102,7 +103,7 @@ public class Main {
 	 * 
 	 * @return the {@link FactHandle} of the inserted fact.
 	 */
-	private static FactHandle insert(KieSession kieSession, String stream, CreditCardTransaction cct) {
+	private FactHandle insert(KieSession kieSession, String stream, CreditCardTransaction cct) {
 		SessionClock clock = kieSession.getSessionClock();
 		if (!(clock instanceof SessionPseudoClock)) {
 			String errorMessage = "This fact inserter can only be used with KieSessions that use a SessionPseudoClock";

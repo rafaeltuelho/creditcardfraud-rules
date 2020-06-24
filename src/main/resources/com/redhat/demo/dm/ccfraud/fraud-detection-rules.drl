@@ -11,11 +11,6 @@ declare CreditCardTransaction
     @timestamp( timestamp )    
 end
 
-// declare PotentialFraudFact 
-// 	creditCardNumber: long
-// 	transactions: java.util.ArrayList
-// end
-
 rule "CC-Transactions last 15 minutes"
 when 
 	// accumulate( <source pattern>; <functions> [;<constraints>] )

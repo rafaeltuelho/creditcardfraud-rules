@@ -73,7 +73,7 @@ public class MainTest {
 
 		LOGGER.debug("Found '" + ccTransactions.size() + "' transactions for creditcard: '" + ccTransaction.getCreditCardNumber() + "'.");
 
-		KieSession kieSession = kieContainer.newKieSession();
+		KieSession kieSession = kieContainer.newKieSession("cdfd-session");
 		// Insert transaction history/context.
 		for (CreditCardTransaction nextTransaction : ccTransactions) {
 			insert(kieSession, "Transactions", nextTransaction);

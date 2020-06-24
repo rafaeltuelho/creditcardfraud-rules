@@ -160,4 +160,19 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<distributionManagement>
+		<repository>
+		  <id>nexus-container</id>
+		  <!-- on OCP should point to http://nexus:8081 -->
+		  <url>http://nexus-unsecure-cat-demo.apps.cluster-catcep-c228.catcep-c228.example.opentlc.com/repository/maven-releases/</url>
+		  <layout>default</layout>
+		</repository>
+		<snapshotRepository>
+		  <id>nexus-container</id>
+		  <!-- on OCP should point to http://nexus:8081 -->
+		  <url>http://nexus-unsecure-cat-demo.apps.cluster-catcep-c228.catcep-c228.example.opentlc.com/repository/maven-snapshots/</url>
+		  <layout>default</layout>
+		</snapshotRepository>
+	  </distributionManagement> 	
 </project>

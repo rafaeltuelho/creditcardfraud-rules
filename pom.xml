@@ -3,7 +3,7 @@
 	<description>Drools Credit Card Fraud Detection Demo</description>
 	<artifactId>creditcardfraud-rules</artifactId>
 	<groupId>com.redhat.demo.dm</groupId>
-	<version>2.0.0</version>
+	<version>1.0.0</version>
 	<!--version>1.0.0-SNAPSHOT</version-->
 
 	<properties>
@@ -121,12 +121,14 @@
 	</dependencies>
 	<build>
 		<plugins>
+			<!-- 
 			<plugin>
 				<groupId>org.kie</groupId>
 				<artifactId>kie-maven-plugin</artifactId>
 				<version>${version.org.kie}</version>
 				<extensions>true</extensions>
 			</plugin>
+			-->
 		</plugins>
 	</build>
 
@@ -134,13 +136,15 @@
 		<repository>
 		  <id>nexus-container</id>
 		  <!-- on OCP should point to http://nexus:8081 -->
-		  <url>http://nexus-unsecure-cat-demo.apps.cluster-catcep-c228.catcep-c228.example.opentlc.com/repository/maven-releases/</url>
+		  <!-- url>http://nexus-unsecure-cat-demo.apps.cluster-catcep-c228.catcep-c228.example.opentlc.com/repository/maven-releases/</url -->
+		  <url>${env.NEXUS_REPO}/repository/maven-releases/</url>
 		  <layout>default</layout>
 		</repository>
 		<snapshotRepository>
 		  <id>nexus-container</id>
 		  <!-- on OCP should point to http://nexus:8081 -->
-		  <url>http://nexus-unsecure-cat-demo.apps.cluster-catcep-c228.catcep-c228.example.opentlc.com/repository/maven-snapshots/</url>
+		  <!-- url>http://nexus-unsecure-cat-demo.apps.cluster-catcep-c228.catcep-c228.example.opentlc.com/repository/maven-snapshots/</url -->
+		  <url>${env.NEXUS_REPO}/repository/maven-snapshots/</url>
 		  <layout>default</layout>
 		</snapshotRepository>
 	  </distributionManagement> 	
